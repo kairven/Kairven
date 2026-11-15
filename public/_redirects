@@ -1,0 +1,4 @@
+# Single-page site. Pages Functions (/api/*) are evaluated before static
+# routing, so this fallback only ever catches document requests — which keeps
+# shared deep links like /#pricing working on a cold load.
+/*  /index.html  200

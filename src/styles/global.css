@@ -1,0 +1,319 @@
+@import 'tailwindcss';
+
+/* ---------------------------------------------------------------------------
+   Fonts are self-hosted via @fontsource (imported in main.tsx) — no Google
+   Fonts CDN round-trip, latin subset only, font-display: swap.
+--------------------------------------------------------------------------- */
+
+@theme {
+  /* "Obsidian & Precision Volt" token set */
+  --color-void: #050507;
+  --color-carbon: #0f0f12;
+  --color-carbon-raised: #16161a;
+  --color-hairline: rgba(255, 255, 255, 0.08);
+  --color-volt: #d4ff00;
+  --color-gold: #e2a856;
+  --color-text-primary: #f5f5f2;
+  --color-text-muted: #8a8a94;
+
+  --radius-card: 14px;
+  --radius-panel: 20px;
+
+  --font-sans:
+    'Instrument Sans Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  --ease-precision: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Fluid display sizes — one scale, used everywhere */
+  --text-display: clamp(2.6rem, 6.2vw, 5.1rem);
+  --text-display--line-height: 0.98;
+  --text-display--letter-spacing: -0.035em;
+  --text-headline: clamp(1.9rem, 3.4vw, 3rem);
+  --text-headline--line-height: 1.06;
+  --text-headline--letter-spacing: -0.028em;
+}
+
+@layer base {
+  :root {
+    --void: #050507;
+    --carbon: #0f0f12;
+    --carbon-raised: #16161a;
+    --hairline: rgba(255, 255, 255, 0.08);
+    --volt: #d4ff00;
+    --gold-telemetry: #e2a856;
+    --text-primary: #f5f5f2;
+    --text-muted: #8a8a94;
+    --radius-card: 14px;
+    --ease-precision: cubic-bezier(0.16, 1, 0.3, 1);
+    color-scheme: dark;
+  }
+
+  * {
+    border-color: var(--hairline);
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    /* Lenis drives the scroll position; native smooth scroll would fight it. */
+    scroll-behavior: auto;
+  }
+
+  body {
+    background: var(--void);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    font-feature-settings: 'ss01', 'cv01';
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+  }
+
+  ::selection {
+    background: var(--volt);
+    color: #05070a;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--volt);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    text-wrap: balance;
+    font-weight: 500;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  /* Respect the OS setting: kill Lenis smoothing + all decorative motion. */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer components {
+  /* 1px specular hairline border — the detail that reads as "expensive" */
+  .card-hairline {
+    position: relative;
+    background: var(--carbon);
+    border-radius: var(--radius-card);
+  }
+  .card-hairline::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.16), transparent 42%);
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* Same treatment, but follows the pointer instead of a fixed diagonal. */
+  .card-spotlight::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    opacity: 0;
+    transition: opacity 0.45s var(--ease-precision);
+    background: radial-gradient(
+      340px circle at var(--mx, 50%) var(--my, 50%),
+      rgba(212, 255, 0, 0.07),
+      transparent 62%
+    );
+    pointer-events: none;
+  }
+  .card-spotlight:hover::after {
+    opacity: 1;
+  }
+
+  /* Subtle grain overlay — kills the "flat AI gradient" look */
+  .noise-overlay {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 60;
+    opacity: 0.032;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 140px 140px;
+  }
+
+  /* Mesh gradient background (CSS-only, no WebGL needed for the base) */
+  .mesh-bg {
+    background:
+      radial-gradient(at 20% 20%, rgba(212, 255, 0, 0.06) 0px, transparent 50%),
+      radial-gradient(at 80% 30%, rgba(226, 168, 86, 0.05) 0px, transparent 50%),
+      var(--void);
+  }
+
+  /* Glassmorphic panel for the diagnostic modal */
+  .glass-panel {
+    background: rgba(15, 15, 18, 0.6);
+    backdrop-filter: blur(20px) saturate(140%);
+    -webkit-backdrop-filter: blur(20px) saturate(140%);
+    border: 1px solid var(--hairline);
+  }
+
+  /* Gold telemetry tag — small status/metric labels */
+  .telemetry-tag {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    color: var(--gold-telemetry);
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+
+  .mono-label {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .hairline-rule {
+    height: 1px;
+    width: 100%;
+    background: linear-gradient(90deg, transparent, var(--hairline) 12%, var(--hairline) 88%, transparent);
+  }
+
+  /* Animated SVG signal path (4a) */
+  .signal-path {
+    stroke-dasharray: 300;
+    stroke-dashoffset: 300;
+    transition: stroke-dashoffset 1s var(--ease-precision);
+  }
+  .signal-path.in-view {
+    stroke-dashoffset: 0;
+  }
+  .signal-node {
+    opacity: 0;
+    transform: scale(0.6);
+    transform-box: fill-box;
+    transform-origin: center;
+    transition:
+      opacity 0.5s var(--ease-precision),
+      transform 0.5s var(--ease-precision);
+  }
+  .signal-node.in-view {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  /* Focus ring for the volt CTA */
+  .btn-volt {
+    background: var(--volt);
+    color: #07080a;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    border-radius: 999px;
+    transition:
+      transform 0.4s var(--ease-precision),
+      box-shadow 0.4s var(--ease-precision);
+    box-shadow: 0 0 0 0 rgba(212, 255, 0, 0);
+  }
+  .btn-volt:hover {
+    box-shadow:
+      0 0 0 1px rgba(212, 255, 0, 0.55),
+      0 14px 46px -14px rgba(212, 255, 0, 0.6);
+  }
+
+  .btn-ghost {
+    border: 1px solid var(--hairline);
+    color: var(--text-primary);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.015);
+    transition:
+      background 0.35s var(--ease-precision),
+      border-color 0.35s var(--ease-precision);
+  }
+  .btn-ghost:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.2);
+  }
+
+  .shell {
+    width: 100%;
+    max-width: 74rem;
+    margin-inline: auto;
+    padding-inline: 1.5rem;
+  }
+  @media (min-width: 768px) {
+    .shell {
+      padding-inline: 2.5rem;
+    }
+  }
+
+  /* Masked gradient text used sparingly on the hero line */
+  .text-dim-gradient {
+    background: linear-gradient(180deg, #f5f5f2 10%, rgba(245, 245, 242, 0.42) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+}
+
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes modalIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -48%) scale(0.975);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+@keyframes bubble {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@layer utilities {
+  .will-transform {
+    will-change: transform;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+}
