@@ -52,6 +52,95 @@
     <meta name="twitter:image" content="https://kairven.com/og-image.jpg" />
     <meta name="twitter:image:alt" content="Kairven — autonomous digital infrastructure" />
 
+    <!--
+      Structured data. A @graph (rather than three loose scripts) lets the
+      Service nodes and the WebSite node point back at one canonical business
+      @id, so Google resolves them as a single entity instead of three
+      unrelated crumbs.
+    -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "ProfessionalService",
+            "@id": "https://kairven.com/#organization",
+            "name": "Kairven",
+            "url": "https://kairven.com/",
+            "description": "Digital infrastructure and automation for clinics, home services, and local businesses.",
+            "image": "https://kairven.com/og-image.jpg",
+            "logo": "https://kairven.com/apple-touch-icon.png",
+            "founder": {
+              "@type": "Person",
+              "name": "Mohammad Sameer Khan"
+            },
+            "areaServed": {
+              "@type": "Country",
+              "name": "India"
+            },
+            "address": {
+              "@type": "PostalAddress",
+              "addressLocality": "Kanpur",
+              "addressRegion": "Uttar Pradesh",
+              "addressCountry": "IN"
+            },
+            "knowsAbout": [
+              "AI front desk automation",
+              "Local search visibility",
+              "CRM pipeline automation"
+            ],
+            "hasOfferCatalog": {
+              "@type": "OfferCatalog",
+              "name": "Kairven services",
+              "itemListElement": [
+                {
+                  "@type": "Offer",
+                  "itemOffered": {
+                    "@type": "Service",
+                    "name": "AI front desk systems",
+                    "description": "24/7 automated response for inbound enquiries across WhatsApp, calls and web forms.",
+                    "serviceType": "Business process automation",
+                    "areaServed": { "@type": "Country", "name": "India" },
+                    "provider": { "@id": "https://kairven.com/#organization" }
+                  }
+                },
+                {
+                  "@type": "Offer",
+                  "itemOffered": {
+                    "@type": "Service",
+                    "name": "Search visibility",
+                    "description": "Local SEO and structured data so the business surfaces in search and map results.",
+                    "serviceType": "Search engine optimisation",
+                    "areaServed": { "@type": "Country", "name": "India" },
+                    "provider": { "@id": "https://kairven.com/#organization" }
+                  }
+                },
+                {
+                  "@type": "Offer",
+                  "itemOffered": {
+                    "@type": "Service",
+                    "name": "CRM pipelines",
+                    "description": "Lead capture, enrichment and routing into a single pipeline.",
+                    "serviceType": "CRM integration",
+                    "areaServed": { "@type": "Country", "name": "India" },
+                    "provider": { "@id": "https://kairven.com/#organization" }
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://kairven.com/#website",
+            "url": "https://kairven.com/",
+            "name": "Kairven",
+            "inLanguage": "en-IN",
+            "publisher": { "@id": "https://kairven.com/#organization" }
+          }
+        ]
+      }
+    </script>
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
