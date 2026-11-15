@@ -107,7 +107,7 @@ export default function HorizontalPanels() {
     <section
       ref={wrapperRef}
       aria-label="Capabilities"
-      className="relative h-svh w-full overflow-hidden bg-ink"
+      className="relative h-svh w-full overflow-hidden bg-void"
     >
       {/*
         Clipper is a separate absolutely-positioned box so nothing overflows
@@ -125,25 +125,25 @@ export default function HorizontalPanels() {
           {panels.map((p) => (
             <article
               key={p.index}
-              className="h-panel flex w-screen shrink-0 snap-center items-center border-l border-white/10 px-6 first:border-l-0 md:px-16"
+              className="h-panel flex w-screen shrink-0 snap-center items-center border-l border-hairline px-6 first:border-l-0 md:px-16"
             >
               <div data-panel-inner className="max-w-lg">
-                <span className="font-mono text-xs tracking-[0.3em] text-accent">
+                <span className="telemetry-tag">
                   {p.index}
                 </span>
                 <h2 className="mt-4 text-4xl font-semibold tracking-tight sm:text-6xl">
                   {p.title}
                 </h2>
-                <p className="mt-4 max-w-md text-sm text-paper/50 sm:text-base">{p.body}</p>
+                <p className="mt-4 max-w-md text-sm text-primary/50 sm:text-base">{p.body}</p>
               </div>
             </article>
           ))}
         </div>
       </div>
 
-      <div className="pointer-events-none absolute inset-x-0 bottom-8 flex items-center justify-center gap-2 text-[10px] tracking-[0.25em] text-paper/30 uppercase">
+      <div className="pointer-events-none absolute inset-x-0 bottom-8 flex items-center justify-center gap-2 telemetry-tag opacity-60">
         <span className="hidden md:inline">Scroll</span>
-        <span className="h-px w-10 bg-white/20" />
+        <span className="h-px w-10 bg-hairline" />
       </div>
     </section>
   )

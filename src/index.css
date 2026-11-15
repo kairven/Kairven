@@ -1,16 +1,55 @@
 @import "tailwindcss";
 
-@theme {
+/* ---------------------------------------------------------------------------
+   Design tokens — single source of truth.
+   Raw values live in :root so hand-written CSS can use them directly; the
+   @theme block maps Tailwind's colour namespace onto the same variables, so
+   `bg-void` and `background: var(--void)` can never drift apart.
+--------------------------------------------------------------------------- */
+:root {
+  --void: #050507;
+  --carbon: #0f0f12;
+  --carbon-raised: #16161a;
+  --hairline: rgba(255, 255, 255, 0.08);
+  --volt: #d4ff00;
+  --gold-telemetry: #e2a856;
+  --text-primary: #f5f5f2;
+  --text-muted: #8a8a94;
+
+  --radius-card: 14px;
+  --ease-precision: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@theme inline {
+  /* Palette */
+  --color-void: var(--void);
+  --color-carbon: var(--carbon);
+  --color-carbon-raised: var(--carbon-raised);
+  --color-hairline: var(--hairline);
+  --color-volt: var(--volt);
+  --color-gold: var(--gold-telemetry);
+  --color-primary: var(--text-primary);
+  --color-muted: var(--text-muted);
+
+  /* Rhythm */
+  --radius-card: var(--radius-card);
+  --ease-precision: var(--ease-precision);
+
+  /* Fonts */
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --color-ink: #0a0a0b;
-  --color-paper: #fafafa;
-  --color-accent: #c8ff3d;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
 html {
-  background: #0a0a0b;
+  background: var(--void);
 }
 
+body {
+  background: var(--void);
+  color: var(--text-primary);
+}
+
+/* --- Lenis ---------------------------------------------------------------- */
 html.lenis,
 html.lenis body {
   height: auto;
@@ -21,6 +60,82 @@ html.lenis body {
 }
 
 ::selection {
-  background: #c8ff3d;
-  color: #0a0a0b;
+  background: var(--volt);
+  color: var(--void);
+}
+
+/* --- Surfaces ------------------------------------------------------------- */
+
+/* 1px specular hairline border — the detail that reads as "expensive" */
+.card-hairline {
+  position: relative;
+  background: var(--carbon);
+  border-radius: var(--radius-card);
+}
+
+.card-hairline::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, var(--hairline), transparent 40%);
+  /* Standard properties are required: `-webkit-mask` alone means Firefox gets
+     no mask at all, so the gradient fills the whole card instead of the edge. */
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* Subtle grain overlay — kills the "flat AI gradient" look */
+.noise-overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Mesh gradient background (CSS-only, no WebGL needed for the base) */
+.mesh-bg {
+  background:
+    radial-gradient(at 20% 20%, rgba(212, 255, 0, 0.06) 0px, transparent 50%),
+    radial-gradient(at 80% 30%, rgba(226, 168, 86, 0.05) 0px, transparent 50%),
+    var(--void);
+}
+
+/* Glassmorphic panel for the diagnostic modal */
+.glass-panel {
+  background: rgba(15, 15, 18, 0.6);
+  backdrop-filter: blur(20px) saturate(140%);
+  -webkit-backdrop-filter: blur(20px) saturate(140%);
+  border: 1px solid var(--hairline);
+}
+
+/* Gold telemetry tag — small status/metric labels */
+.telemetry-tag {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  color: var(--gold-telemetry);
+  text-transform: uppercase;
+}
+
+/* Honour reduced motion for the CSS-only effects the JS cannot reach. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

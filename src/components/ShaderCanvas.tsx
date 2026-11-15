@@ -73,8 +73,8 @@ interface Props {
 }
 
 export default function ShaderCanvas({
-  colorA = [0.04, 0.04, 0.05],
-  colorB = [0.78, 0.99, 0.24],
+  colorA = [0.02, 0.02, 0.027],   // --void  #050507
+  colorB = [0.831, 1.0, 0.0],     // --volt  #D4FF00
   className,
 }: Props) {
   const hostRef = useRef<HTMLDivElement>(null)
