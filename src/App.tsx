@@ -9,6 +9,8 @@ import { gsap, ScrollTrigger } from "@/lib/smoothScroll"
 import { useMagneticButton } from "@/hooks/useMagneticButton"
 import ShaderCanvas from "@/components/ShaderCanvas"
 import HorizontalPanels from "@/components/HorizontalPanels"
+import Modules from "@/components/Modules"
+import { routeToWhatsApp } from "@/lib/waRoute"
 import { Button } from "@/components/Button"
 import { useStore } from "@/store/useStore"
 import { cn } from "@/lib/utils"
@@ -47,6 +49,8 @@ export default function App() {
   const reduce = useReducedMotion()
   const { count, increment, decrement } = useStore()
   const [open, setOpen] = useState(false)
+  const [sending, setSending] = useState(false)
+  const [formError, setFormError] = useState<string | null>(null)
   const [filter, setFilter] = useState("all")
 
   useEffect(() => {
@@ -111,23 +115,56 @@ export default function App() {
                 </div>
                 <form
                   className="mt-6 space-y-3"
-                  onSubmit={(e) => {
+                  onSubmit={async (e) => {
                     e.preventDefault()
-                    setOpen(false)
+                    const data = new FormData(e.currentTarget)
+                    setSending(true)
+                    setFormError(null)
+                    try {
+                      // The number lives only in the serverless function's env.
+                      await routeToWhatsApp({
+                        name: String(data.get("name") ?? ""),
+                        business: String(data.get("business") ?? ""),
+                        painPoint: String(data.get("painPoint") ?? ""),
+                      })
+                      setOpen(false)
+                    } catch {
+                      // Opening wa.me directly is a reasonable fallback, but the
+                      // number is deliberately not in the bundle — so surface the
+                      // failure instead of inventing a destination.
+                      setFormError("Couldn't open WhatsApp. Email hello@kairven.com instead.")
+                    } finally {
+                      setSending(false)
+                    }
                   }}
                 >
                   <input
+                    name="name"
                     required
-                    placeholder="Your email"
-                    className="h-11 w-full rounded-lg border border-white/10 bg-black/40 px-3 text-sm outline-none focus:border-volt"
+                    autoComplete="name"
+                    placeholder="Your name"
+                    className="h-11 w-full rounded-lg border border-hairline bg-carbon px-3 text-sm outline-none focus:border-volt"
+                  />
+                  <input
+                    name="business"
+                    autoComplete="organization"
+                    placeholder="Business (optional)"
+                    className="h-11 w-full rounded-lg border border-hairline bg-carbon px-3 text-sm outline-none focus:border-volt"
                   />
                   <textarea
+                    name="painPoint"
+                    required
                     rows={3}
-                    placeholder="What are you building?"
-                    className="w-full resize-none rounded-lg border border-white/10 bg-black/40 p-3 text-sm outline-none focus:border-volt"
+                    placeholder="What's the bottleneck?"
+                    className="w-full resize-none rounded-lg border border-hairline bg-carbon p-3 text-sm outline-none focus:border-volt"
                   />
-                  <Button type="submit" className="w-full">
-                    Send brief
+                  {formError && (
+                    <p role="alert" className="text-xs text-gold">
+                      {formError}
+                    </p>
+                  )}
+                  <Button type="submit" className="w-full" disabled={sending}>
+                    {sending ? "Opening WhatsApp…" : "Continue on WhatsApp"}
                   </Button>
                 </form>
               </Dialog.Content>
@@ -227,6 +264,9 @@ export default function App() {
           ))}
         </div>
       </section>
+
+      {/* Interactive modules */}
+      <Modules />
 
       {/* Zustand demo */}
       <section className="mx-auto max-w-6xl px-6 pb-32">
