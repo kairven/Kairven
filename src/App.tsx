@@ -1,14 +1,37 @@
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { motion, useReducedMotion } from "framer-motion"
 import CountUp from "react-countup"
 import * as Dialog from "@radix-ui/react-dialog"
 import * as ToggleGroup from "@radix-ui/react-toggle-group"
 import { ArrowUpRight, Minus, Plus, X } from "lucide-react"
-import { useSmoothScroll, gsap, ScrollTrigger } from "@/hooks/useSmoothScroll"
+import { useSmoothScroll } from "@/hooks/useSmoothScroll"
+import { gsap, ScrollTrigger } from "@/lib/smoothScroll"
+import { useMagneticButton } from "@/hooks/useMagneticButton"
 import ShaderCanvas from "@/components/ShaderCanvas"
 import { Button } from "@/components/Button"
 import { useStore } from "@/store/useStore"
 import { cn } from "@/lib/utils"
+
+/**
+ * Wraps a Button so the magnetic transform lands on an outer div, not the
+ * <button> itself. Keeping transform off the button preserves its hit area and
+ * avoids fighting focus rings / press states.
+ */
+function Magnetic({
+  children,
+  strength = 0.35,
+}: {
+  children: React.ReactNode
+  strength?: number
+}) {
+  const ref = useRef<HTMLDivElement>(null)
+  useMagneticButton(ref, { strength })
+  return (
+    <div ref={ref} className="inline-block">
+      {children}
+    </div>
+  )
+}
 
 const stats = [
   { value: 128, suffix: "+", label: "Shipped interfaces" },
@@ -136,18 +159,22 @@ export default function App() {
             together and ready to build on.
           </p>
           <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
-            <Button size="lg" onClick={() => setOpen(true)}>
-              Start a project <ArrowUpRight className="size-4" />
-            </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              onClick={() =>
-                document.getElementById("stats")?.scrollIntoView({ behavior: "smooth" })
-              }
-            >
-              See the numbers
-            </Button>
+            <Magnetic>
+              <Button size="lg" onClick={() => setOpen(true)}>
+                Start a project <ArrowUpRight className="size-4" />
+              </Button>
+            </Magnetic>
+            <Magnetic strength={0.2}>
+              <Button
+                size="lg"
+                variant="outline"
+                onClick={() =>
+                  document.getElementById("stats")?.scrollIntoView({ behavior: "smooth" })
+                }
+              >
+                See the numbers
+              </Button>
+            </Magnetic>
           </div>
         </motion.div>
       </section>
