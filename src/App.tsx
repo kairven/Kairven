@@ -8,6 +8,7 @@ import { useSmoothScroll } from "@/hooks/useSmoothScroll"
 import { gsap, ScrollTrigger } from "@/lib/smoothScroll"
 import { useMagneticButton } from "@/hooks/useMagneticButton"
 import ShaderCanvas from "@/components/ShaderCanvas"
+import HorizontalPanels from "@/components/HorizontalPanels"
 import { Button } from "@/components/Button"
 import { useStore } from "@/store/useStore"
 import { cn } from "@/lib/utils"
@@ -178,6 +179,9 @@ export default function App() {
           </div>
         </motion.div>
       </section>
+
+      {/* Horizontal pinned panels */}
+      <HorizontalPanels />
 
       {/* Pills / toggle */}
       <section className="mx-auto max-w-6xl px-6 py-24">
