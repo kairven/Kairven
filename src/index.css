@@ -1,0 +1,26 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --color-ink: #0a0a0b;
+  --color-paper: #fafafa;
+  --color-accent: #c8ff3d;
+}
+
+html {
+  background: #0a0a0b;
+}
+
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+::selection {
+  background: #c8ff3d;
+  color: #0a0a0b;
+}
