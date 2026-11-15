@@ -1,0 +1,13 @@
+# Cloudflare Pages redirects.
+#
+# No SPA catch-all here on purpose. Pages already resolves an unknown path to
+# /index.html with a 200 for this kind of project (verified against
+# `wrangler pages dev`: /work and /some/deep/link both return the shell).
+#
+# A `/*  /index.html  200` rule is actively wrong on Pages — it is rejected at
+# deploy time as an infinite loop, because resolving /index.html re-enters the
+# same rule. Wrangler logs it as an invalid rule and ignores it, so you'd ship
+# believing you had a fallback that does not exist.
+#
+# Real 301s go here, above nothing, e.g.:
+# /old-path    /new-path    301

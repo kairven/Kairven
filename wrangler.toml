@@ -1,0 +1,11 @@
+# Cloudflare Pages configuration.
+# `pages_build_output_dir` lets Wrangler treat this as a Pages project so
+# `wrangler pages deploy` picks up ./functions automatically — no flags needed.
+name = "kairven"
+pages_build_output_dir = "dist"
+compatibility_date = "2026-11-15"
+
+[vars]
+# Non-secret defaults only. KAIRVEN_WHATSAPP_NUMBER stays out of this file:
+# set it as an encrypted variable in the Pages dashboard (Settings → Variables
+# and Secrets) or via `wrangler pages secret put KAIRVEN_WHATSAPP_NUMBER`.
