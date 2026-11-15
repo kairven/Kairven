@@ -1,29 +1,21 @@
 import { useEffect, useRef } from "react"
-import Lenis from "@studio-freight/lenis"
-import gsap from "gsap"
-import { ScrollTrigger } from "gsap/ScrollTrigger"
+import type Lenis from "@studio-freight/lenis"
+import { initSmoothScroll } from "@/lib/smoothScroll"
 
-gsap.registerPlugin(ScrollTrigger)
-
+/**
+ * React binding for `initSmoothScroll`. Keeps the instance in a ref so
+ * components can call `lenis.scrollTo(...)` (e.g. anchor links), and tears
+ * everything down on unmount — including under StrictMode's double-invoke.
+ */
 export function useSmoothScroll() {
   const lenisRef = useRef<Lenis | null>(null)
 
   useEffect(() => {
-    const lenis = new Lenis({
-      duration: 1.1,
-      easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-    })
-    lenisRef.current = lenis
-
-    lenis.on("scroll", ScrollTrigger.update)
-
-    const raf = (time: number) => lenis.raf(time * 1000)
-    gsap.ticker.add(raf)
-    gsap.ticker.lagSmoothing(0)
+    const instance = initSmoothScroll()
+    lenisRef.current = instance.lenis
 
     return () => {
-      gsap.ticker.remove(raf)
-      lenis.destroy()
+      instance.destroy()
       lenisRef.current = null
     }
   }, [])
@@ -31,4 +23,4 @@ export function useSmoothScroll() {
   return lenisRef
 }
 
-export { gsap, ScrollTrigger }
+export { gsap, ScrollTrigger } from "@/lib/smoothScroll"
