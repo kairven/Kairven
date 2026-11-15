@@ -1,19 +1,19 @@
-import { useEffect, useRef, useState } from "react"
-import { motion, useReducedMotion } from "framer-motion"
-import CountUp from "react-countup"
+import { Suspense, lazy, useEffect, useRef, useState } from "react"
 import * as Dialog from "@radix-ui/react-dialog"
-import * as ToggleGroup from "@radix-ui/react-toggle-group"
-import { ArrowUpRight, Minus, Plus, X } from "lucide-react"
+import { ArrowUpRight, X } from "lucide-react"
 import { useSmoothScroll } from "@/hooks/useSmoothScroll"
 import { gsap, ScrollTrigger } from "@/lib/smoothScroll"
 import { useMagneticButton } from "@/hooks/useMagneticButton"
-import ShaderCanvas from "@/components/ShaderCanvas"
-import HorizontalPanels from "@/components/HorizontalPanels"
-import Modules from "@/components/Modules"
+import LazyShaderCanvas from "@/components/LazyShaderCanvas"
+/*
+  Below-the-fold sections are split out of the initial bundle. On a cold mobile
+  load this is the difference between shipping the hero and shipping the whole
+  page before first paint; React resolves each chunk as it scrolls into range.
+*/
+const HorizontalPanels = lazy(() => import("@/components/HorizontalPanels"))
+const BelowFold = lazy(() => import("@/components/BelowFold"))
 import { routeToWhatsApp } from "@/lib/waRoute"
 import { Button } from "@/components/Button"
-import { useStore } from "@/store/useStore"
-import { cn } from "@/lib/utils"
 
 /**
  * Wraps a Button so the magnetic transform lands on an outer div, not the
@@ -36,22 +36,30 @@ function Magnetic({
   )
 }
 
-const stats = [
-  { value: 128, suffix: "+", label: "Shipped interfaces" },
-  { value: 60, suffix: "fps", label: "Motion budget" },
-  { value: 98, suffix: "", label: "Lighthouse score" },
-]
-
-const pills = ["WebGL", "GSAP", "TypeScript", "Tailwind v4"]
-
 export default function App() {
   useSmoothScroll()
-  const reduce = useReducedMotion()
-  const { count, increment, decrement } = useStore()
+  // Hero reveal is a GSAP tween rather than Framer Motion: one fade-in did not
+  // justify a 104 KB runtime. GSAP is already loaded for ScrollTrigger here.
+  const heroRef = useRef<HTMLDivElement>(null)
   const [open, setOpen] = useState(false)
   const [sending, setSending] = useState(false)
   const [formError, setFormError] = useState<string | null>(null)
   const [filter, setFilter] = useState("all")
+
+  useEffect(() => {
+    // Hero reveal — respects reduced motion by simply not setting a from-state.
+    const hero = heroRef.current
+    if (hero && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      gsap.from(hero, {
+        opacity: 0,
+        y: 24,
+        duration: 0.9,
+        ease: "power3.out",
+        // clearProps so no residual transform survives to trap position:fixed children
+        clearProps: "transform,opacity",
+      })
+    }
+  }, [])
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -175,15 +183,10 @@ export default function App() {
 
       {/* Hero */}
       <section className="relative flex min-h-svh flex-col items-center justify-center overflow-hidden px-6">
-        <ShaderCanvas className="absolute inset-0 z-0 opacity-90" />
+        <LazyShaderCanvas className="absolute inset-0 z-0 opacity-90" />
         <div className="pointer-events-none absolute inset-0 z-0 bg-gradient-to-b from-void/40 via-transparent to-void" />
 
-        <motion.div
-          initial={reduce ? false : { opacity: 0, y: 24 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
-          className="relative z-10 max-w-3xl text-center"
-        >
+        <div ref={heroRef} className="relative z-10 max-w-3xl text-center">
           <span className="telemetry-tag inline-flex items-center gap-2 rounded-full border border-hairline bg-carbon-raised/70 px-3 py-1 backdrop-blur">
             <span className="size-1.5 rounded-full bg-volt" />
             Core — v0.1
@@ -216,83 +219,19 @@ export default function App() {
               </Button>
             </Magnetic>
           </div>
-        </motion.div>
+        </div>
       </section>
 
       {/* Horizontal pinned panels */}
-      <HorizontalPanels />
+      <Suspense fallback={<div className="h-svh" />}>
+        <HorizontalPanels />
+      </Suspense>
 
-      {/* Pills / toggle */}
-      <section className="mx-auto max-w-6xl px-6 py-24">
-        <div data-reveal className="flex flex-wrap items-center justify-between gap-6">
-          <p className="max-w-sm text-sm text-primary/50">
-            Every layer is swappable — drop in your own shader, easing curve or data source.
-          </p>
-          <ToggleGroup.Root
-            type="single"
-            value={filter}
-            onValueChange={(v) => v && setFilter(v)}
-            className="flex flex-wrap gap-1 rounded-full border border-white/10 p-1"
-          >
-            {pills.map((p) => (
-              <ToggleGroup.Item
-                key={p}
-                value={p.toLowerCase()}
-                className={cn(
-                  "rounded-full px-4 py-2 text-xs font-medium text-primary/60 transition",
-                  "data-[state=on]:bg-volt data-[state=on]:text-void hover:text-primary"
-                )}
-              >
-                {p}
-              </ToggleGroup.Item>
-            ))}
-          </ToggleGroup.Root>
-        </div>
-      </section>
+      <Suspense fallback={<div className="h-[600px]" />}>
+        <BelowFold filter={filter} setFilter={setFilter} />
+      </Suspense>
 
-      {/* Stats */}
-      <section id="stats" className="mx-auto max-w-6xl px-6 pb-24">
-        <div className="grid gap-px overflow-hidden rounded-[var(--radius-card)] border border-hairline bg-hairline sm:grid-cols-3">
-          {stats.map((s) => (
-            <div key={s.label} data-reveal className="bg-void p-8">
-              <div className="text-4xl font-semibold tracking-tight">
-                <CountUp end={s.value} duration={2.2} decimals={0} />
-                <span className="text-volt">{s.suffix}</span>
-              </div>
-              <p className="mt-2 text-sm text-primary/50">{s.label}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Interactive modules */}
-      <Modules />
-
-      {/* Zustand demo */}
-      <section className="mx-auto max-w-6xl px-6 pb-32">
-        <div
-          data-reveal
-          className="card-hairline flex flex-col items-start justify-between gap-6 p-8 sm:flex-row sm:items-center"
-        >
-          <div>
-            <h2 className="text-xl font-semibold">Shared state, one store</h2>
-            <p className="mt-1 text-sm text-primary/50">
-              Zustand keeps cross-section state tiny and predictable.
-            </p>
-          </div>
-          <div className="flex items-center gap-3">
-            <Button variant="outline" size="sm" onClick={decrement} aria-label="Decrease">
-              <Minus className="size-4" />
-            </Button>
-            <span className="w-12 text-center font-mono text-2xl tabular-nums">{count}</span>
-            <Button size="sm" onClick={increment} aria-label="Increase">
-              <Plus className="size-4" />
-            </Button>
-          </div>
-        </div>
-      </section>
-
-      <footer className="border-t border-white/10 px-6 py-8">
+      <footer className="border-t border-hairline px-6 py-8">
         <div className="mx-auto flex max-w-6xl flex-col gap-2 text-xs text-primary/40 sm:flex-row sm:items-center sm:justify-between">
           <span>© {new Date().getFullYear()} Kairven</span>
           <span>Built with React 18 · Vite 5 · Tailwind 4 · OGL</span>
