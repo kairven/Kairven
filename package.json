@@ -1,0 +1,54 @@
+{
+  "name": "kairven-site",
+  "version": "1.0.0",
+  "description": "Kairven — autonomous digital infrastructure for growing businesses.",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview --host 0.0.0.0",
+    "typecheck": "tsc --noEmit",
+    "smoke:bundle": "esbuild src/main.tsx --bundle --format=iife --outfile=.smoke/bundle.js --loader:.css=empty --alias:@=./src --define:process.env.NODE_ENV=\"development\" --jsx=automatic --log-level=warning",
+    "smoke": "node scripts/smoke.mjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kairven/Kairven.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/kairven/Kairven/issues"
+  },
+  "homepage": "https://github.com/kairven/Kairven#readme",
+  "dependencies": {
+    "@gsap/react": "^2.1.2",
+    "@radix-ui/react-dialog": "^1.3.1",
+    "@radix-ui/react-toggle-group": "^1.2.1",
+    "@studio-freight/lenis": "^1.0.42",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "gsap": "^3.12.7",
+    "lucide-react": "^0.456.0",
+    "ogl": "^1.0.6",
+    "react": "^18.3.1",
+    "react-countup": "^6.5.3",
+    "react-dom": "^18.3.1",
+    "tailwind-merge": "^3.7.0",
+    "zustand": "^4.5.7"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.3.5",
+    "@types/node": "^26.6.6",
+    "@types/react": "^18.3.31",
+    "@types/react-dom": "^18.3.7",
+    "@vitejs/plugin-react": "^4.7.0",
+    "esbuild": "^0.24.0",
+    "jsdom": "^31.0.1",
+    "tailwindcss": "^4.3.5",
+    "typescript": "^5.6.3",
+    "vite": "^5.4.21"
+  },
+  "private": true,
+  "type": "module"
+}

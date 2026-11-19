@@ -1,0 +1,9 @@
+name = "kairven"
+pages_build_output_dir = "dist"
+compatibility_date = "2024-11-01"
+
+# The WhatsApp number is a SECRET, never a [vars] entry and never in the bundle:
+#   npx wrangler pages secret put KAIRVEN_WHATSAPP_NUMBER --project-name kairven
+# Optional, for sending via the Meta Cloud API instead of a wa.me deep link:
+#   npx wrangler pages secret put KAIRVEN_WA_TOKEN      --project-name kairven
+#   npx wrangler pages secret put KAIRVEN_WA_PHONE_ID   --project-name kairven
